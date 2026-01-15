@@ -44,7 +44,7 @@ function connexion(array $user)
         $_SESSION['lastname'] = $userSelected['lastname'];
         $_SESSION['email'] = $userSelected['email'];
 
-        header('Location: ./index.php');
+        header('Location: ./profile.php');
 
     } else {
         return "Le mot de passe ou le compte est invalide.";
