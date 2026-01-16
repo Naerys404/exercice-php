@@ -30,7 +30,6 @@ if (isset($_POST["submit"])) {
 
 function add_user(array $user, string $file)
 {
-    $role = "utilisateur";
     try {
 
         $bdd = connect_bdd();
