@@ -47,7 +47,7 @@ function add_article(array $article, array $user)
         $id_article = $bdd->lastInsertId(); 
         $cat = intval($article['category']);
 
-        addCategoryToArticle($id_article, $cat);
+       add_category_to_article($id_article, $cat);
             
     } catch (PDOException $e) {
         return "L'article n'a pas pu être ajouté correctement.";
@@ -55,7 +55,7 @@ function add_article(array $article, array $user)
     return "L'article a été ajouté.";
 }
 
-function addCategoryToArticle(int $id_article, int $id_cat){
+function add_category_to_article(int $id_article, int $id_cat){
     try{
         $bdd = connect_bdd();
         $sql = "INSERT INTO article_category(id_article, id_category) VALUES (? , ?)";
