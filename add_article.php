@@ -7,11 +7,14 @@ session_start();
 if(isset($_SESSION['id'])){
 
     $user = getUser($_SESSION['id']);
+    $categories = getAllCategories();
+    
     
     if (isset($_POST["submit"])) {
         if (
             !empty($_POST["title"]) &&
-            !empty($_POST["content"])
+            !empty($_POST["content"]) &&
+            !empty($_POST["category"])
         ) {
             sanitize_array($_POST);
             $message = add_article($_POST, $user);
@@ -28,10 +31,9 @@ if(isset($_SESSION['id'])){
 function add_article(array $article, array $user)
 {
     try {
-
         $bdd = connect_bdd();
 
-        $sql = "INSERT INTO article(title, content, created_at, id_users) VALUE(?,?,?,?)";
+        $sql = "INSERT INTO app.article(title, content, created_at, id_users) VALUE(?,?,?,?)";
 
         $req = $bdd->prepare($sql);
 
@@ -41,13 +43,33 @@ function add_article(array $article, array $user)
         $req->bindValue(4, $user['id'], PDO::PARAM_INT);
 
         $req->execute();
+
+        $id_article = $bdd->lastInsertId(); 
+        $cat = intval($article['category']);
+
+        addCategoryToArticle($id_article, $cat);
+            
     } catch (PDOException $e) {
         return "L'article n'a pas pu être ajouté correctement.";
     }
     return "L'article a été ajouté.";
 }
-?>
 
+function addCategoryToArticle(int $id_article, int $id_cat){
+    try{
+        $bdd = connect_bdd();
+        $sql = "INSERT INTO article_category(id_article, id_category) VALUES (? , ?)";
+        $req = $bdd->prepare($sql);
+    
+        $req->bindValue(1, $id_article, PDO::PARAM_INT);
+        $req->bindValue(2, $id_cat, PDO::PARAM_INT);
+    
+        $req->execute();
+    } catch (PDOException $e){
+        dump($e->getMessage());
+    }
+}
+?>
 
 <html lang="en">
 
@@ -64,8 +86,13 @@ function add_article(array $article, array $user)
 
     <main class="container">
         <h1>Ajouter un article</h1>
-        <form action="" method="post" enctype="multipart/form-data">
+        <form action="" method="post">
             <fieldset>
+                <select name="category">
+                    <?php foreach($categories as $cat): ?>
+                        <option value="<?= $cat['id']?>" ><?= $cat['name_category'] ?></option>
+                    <?php endforeach; ?>
+                </select>
                 <input type="text" name="title" placeholder="Saisir le titre">
                 <textarea  name="content" placeholder="Saisir le contenu"></textarea>
                 <input type="datetime-local" name="created_at">

@@ -83,3 +83,17 @@ function getUser(int $id){
     }
 }
 
+function getAllCategories(){
+       try  {
+    
+        $bdd = connect_bdd();
+
+        $sql = "SELECT c.id, c.name_category FROM app.category AS c";
+        $req =  $req = $bdd->prepare($sql);
+        $req->execute();
+        return $req->fetchAll(PDO::FETCH_ASSOC);
+
+    } catch(PDOException $e){
+        return "La récupération des catégories a échoué.";
+    }
+}
