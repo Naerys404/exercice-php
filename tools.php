@@ -39,3 +39,31 @@ function sanitize_array(array &$data): void
         } 
     }
 }
+
+function getFileExtension($file)
+{
+    return substr(strrchr($file, '.'), 1);
+}
+
+function uploadFile(array $file, string $username)  {
+
+        $name = $file["name"];
+        $temp = $file["tmp_name"];
+    
+        $ext =  strtolower(getFileExtension($name));
+ 
+        if ($ext == "png" || $ext == "jpg" || $ext == "jpeg") {
+
+            if ($file["size"] > (1024*1204)) {
+                echo "le fichier est trop grand";
+            } else {
+                $new_name = uniqid("fichier", true);
+                $new_name = "public/" . $username . "." . $ext;
+                move_uploaded_file($temp, $new_name);
+                return $username . "." . $ext;
+            }
+        } else {
+            echo "Le format est invalide";
+        }
+}
+

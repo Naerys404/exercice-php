@@ -8,27 +8,34 @@ if (isset($_POST["submit"])) {
         !empty($_POST["firstname"]) &&
         !empty($_POST["lastname"]) &&
         !empty($_POST["email"]) &&
-        !empty($_POST["password"])
+        !empty($_POST["password"]) 
+        
     ) {
         sanitize_array($_POST);
 
         $_POST["password"] = password_hash($_POST["password"], PASSWORD_DEFAULT);
 
-        $message = add_user($_POST);
+        if (isset($_FILES["fichier"]) && !empty($_FILES["fichier"]["tmp_name"])) {
+           $file = uploadFile($_FILES['fichier'], $_POST['firstname']);
+        } else {
+           $file = "default.webp";
+        }
+
+        $message = add_user($_POST, $file);
     } else {
         $message = "Veuillez remplir les champs du formulaire";
     }
 }
 
 
-function add_user(array $user)
+function add_user(array $user, string $file)
 {
     $role = "utilisateur";
     try {
 
         $bdd = connect_bdd();
 
-        $sql = "INSERT INTO users(firstname, lastname, email,`password`, roles) VALUE(?,?,?,?,?)";
+        $sql = "INSERT INTO users(firstname, lastname, email,`password`, roles, img) VALUE(?,?,?,?,?,?)";
 
         $req = $bdd->prepare($sql);
 
@@ -41,6 +48,7 @@ function add_user(array $user)
         } else {
             $req->bindValue(5, 'ROLE_USER', PDO::PARAM_STR);
         }
+        $req->bindValue(6, $file, PDO::PARAM_STR);
         $req->execute();
     } catch (Exception $e) {
         return "Le compte existe déja";
@@ -65,12 +73,14 @@ function add_user(array $user)
 
     <main class="container">
         <h1>Ajouter un compte</h1>
-        <form action="" method="post">
+        <form action="" method="post" enctype="multipart/form-data">
             <fieldset>
                 <input type="text" name="firstname" placeholder="Saisir votre prénom">
                 <input type="text" name="lastname" placeholder="Saisir votre nom">
                 <input type="email" name="email" placeholder="Saisir votre email">
                 <input type="password" name="password" placeholder="Saisir votre mot de passe">
+                <input type="file" name="fichier">
+
                 <label for="roles">
                     Cocher pour rôle admin
                     <input type="checkbox" id="roles" name="roles" aria-label="Rôle administrateur">
