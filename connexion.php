@@ -23,7 +23,7 @@ function connexion(array $user)
     
         $bdd = connect_bdd();
       
-        $sql = "SELECT u.email, u.firstname , u.lastname, u.password FROM app.users AS u WHERE u.email = ?";
+        $sql = "SELECT u.id, u.email, u.firstname , u.lastname, u.password FROM app.users AS u WHERE u.email = ?";
 
         $req = $bdd->prepare($sql);
         $req->bindValue(1, $user["email"], PDO::PARAM_STR);
@@ -43,6 +43,7 @@ function connexion(array $user)
         $_SESSION['firstname'] = $userSelected['firstname'];
         $_SESSION['lastname'] = $userSelected['lastname'];
         $_SESSION['email'] = $userSelected['email'];
+        $_SESSION['id'] = $userSelected['id'];
 
         header('Location: ./profile.php');
 

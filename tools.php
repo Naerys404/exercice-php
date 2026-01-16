@@ -67,3 +67,19 @@ function uploadFile(array $file, string $username)  {
         }
 }
 
+function getUser(int $id){
+    try  {
+    
+        $bdd = connect_bdd();
+
+        $sql = "SELECT u.id , u.firstname, u.lastname, u.img, u.email FROM app.users AS u WHERE u.id = ?";
+        $req =  $req = $bdd->prepare($sql);
+        $req->bindValue(1, $id, PDO::PARAM_STR);
+        $req->execute();
+        return $req->fetch(PDO::FETCH_ASSOC);
+
+    } catch(PDOException $e){
+        return "L'utilisateur est introuvable.";
+    }
+}
+
